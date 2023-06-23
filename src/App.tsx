@@ -4,7 +4,7 @@ import Content from './components/Content';
 
 function App() {
   return (
-    <div className='App'>
+    <div className='App user-select-none'>
       <Background></Background>
       <Content></Content>
     </div>
