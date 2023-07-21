@@ -6,18 +6,19 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 export interface IEntry {
     tag: string;
-    date: string;
+    date: number;
     direction: number;
 }
 
 
 function Content() {
     const [entries, setEntries] = useState<IEntry[]>([]);
-    const [socketUrl, setSocketUrl] = useState(`ws://${window.location.host}/ws-test`);
+    const [socketUrl, setSocketUrl] = useState(`ws://${window.location.hostname}/ws`);
     const { lastMessage, readyState } = useWebSocket(socketUrl);
     useEffect(() => {
+        console.log('**** Message', lastMessage);
         if (lastMessage !== null) {
-            setEntries(lastMessage as unknown as IEntry[]);
+            setEntries(JSON.parse(lastMessage.data) as IEntry[]);
         }
     }, [lastMessage, setEntries]);
 
@@ -44,7 +45,8 @@ function Content() {
                     </Navbar.Brand>
                 </Container>
             </Navbar>
-            <div className="content">
+            <div className="content d-flex flex-column">
+                <div>Connection state to the Hardware: { connectionStatus }</div>
                 <Table striped bordered variant="dark">
                     <thead>
                         <tr>
@@ -58,8 +60,9 @@ function Content() {
                         {entries.map((listValue, index) => {
                             return (
                                 <tr key={index}>
+                                    <td>{index}</td>
                                     <td>{listValue.tag}</td>
-                                    <td>{new Date(parseInt(listValue.date)).toLocaleDateString()}</td>
+                                    <td>{new Date(listValue.date * 1000).toLocaleDateString()} - {new Date(listValue.date * 1000).toLocaleTimeString()}</td>
                                     <td>{listValue.direction}</td>
                                 </tr>
                             );
