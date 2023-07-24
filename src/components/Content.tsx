@@ -1,7 +1,6 @@
 import { Table, Navbar, Container, Badge, Spinner, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHandshakeSlash } from '@fortawesome/free-solid-svg-icons'
-
+import { faHandshakeSlash } from '@fortawesome/free-solid-svg-icons/faHandshakeSlash'
 import './Content.scss'
 import logo from '../assets/app-icon.png'; // Tell webpack this JS file uses this image
 import { useCallback, useEffect, useState } from 'react';
