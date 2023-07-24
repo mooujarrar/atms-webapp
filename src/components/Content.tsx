@@ -1,26 +1,29 @@
-import { Table, Navbar, Container, Badge } from 'react-bootstrap';
+import { Table, Navbar, Container, Badge, Spinner, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHandshakeSlash } from '@fortawesome/free-solid-svg-icons'
+
 import './Content.scss'
 import logo from '../assets/app-icon.png'; // Tell webpack this JS file uses this image
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-
-export interface IEntry {
-    tag: string;
-    date: number;
-    direction: number;
-}
+import { FAKE_ENTRIES } from '../data/fake_sink';
+import { IEntry } from '../model/Entry';
 
 
 function Content() {
     const [entries, setEntries] = useState<IEntry[]>([]);
     const [socketUrl, setSocketUrl] = useState(`ws://${window.location.hostname}/ws`);
-    const { lastMessage, readyState } = useWebSocket(socketUrl);
+    const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+    const isFake = false;
     useEffect(() => {
         console.log('**** Message', lastMessage);
         if (lastMessage !== null) {
-            setEntries(JSON.parse(lastMessage.data) as IEntry[]);
+            setEntries((JSON.parse(lastMessage.data) as IEntry[]).sort((a, b) => (a.date > b.date ? -1 : 1)));
         }
-    }, [lastMessage, setEntries]);
+        if(isFake) {
+            setEntries(FAKE_ENTRIES.sort((a, b) => (a.date > b.date ? -1 : 1)));
+        }
+    }, [lastMessage, setEntries, isFake]);
 
     const connectionStatus = {
         [ReadyState.CONNECTING]: 'Connecting',
@@ -29,6 +32,8 @@ function Content() {
         [ReadyState.CLOSED]: 'Closed',
         [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
     }[readyState];
+
+    const onResetClicked = useCallback(() => sendMessage('reset_db'), []);
 
     return (
         <div className="app">
@@ -46,32 +51,54 @@ function Content() {
                 </Container>
             </Navbar>
             <div className="content d-flex flex-column">
-                <div>Connection state to the Hardware: { connectionStatus }</div>
-                <Table striped bordered variant="dark">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Tag</th>
-                            <th>Date</th>
-                            <th>Direction</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {entries.map((listValue, index) => {
-                            return (
-                                <tr key={index}>
-                                    <td>{index}</td>
-                                    <td>{listValue.tag}</td>
-                                    <td>{new Date(listValue.date * 1000).toLocaleDateString()} - {new Date(listValue.date * 1000).toLocaleTimeString()}</td>
-                                    <td>{listValue.direction}</td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </Table>
+                {/*<div className="status">Connection state to the Hardware: {connectionStatus}</div>*/}
+                <div className="table-container">
+                    { (readyState === ReadyState.OPEN || isFake) ?
+                        <div style={{ width: "100%" }}>
+                            <Table striped bordered variant="dark">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tag</th>
+                                        <th>Date</th>
+                                        <th>Direction</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {entries.map((listValue, index) => {
+                                        return (
+                                            <tr key={index}>
+                                                <td>{index}</td>
+                                                <td>{listValue.tag}</td>
+                                                <td>{new Date(listValue.date * 1000).toLocaleDateString()} - {new Date(listValue.date * 1000).toLocaleTimeString()}</td>
+                                                <td>{listValue.direction}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </Table>
+                            <div className='actions'>
+                                <Button variant="light" onClick={onResetClicked}>Reset entries</Button>
+                            </div>
+                        </div> :
+                        <div className="d-flex flex-column align-items-center">
+                            {
+                                readyState === ReadyState.CONNECTING ?
+                                    <Spinner
+                                        as="span"
+                                        animation="grow"
+                                        role="status"
+                                        aria-hidden="true"
+                                        variant="primary"
+                                    /> : <FontAwesomeIcon style={{ color: "#B71C1C" }} icon={faHandshakeSlash} size="2xl" />
+                            }
+                            <span style={{ color: readyState === ReadyState.CLOSED ? "#B71C1C" : "white", fontWeight: "bold" }}>{connectionStatus}</span>
+                        </div>
+                    }
+                </div>
             </div>
             <div>
-                <h5 className='d-flex justify-content-end'>
+                <h5 className='d-flex justify-content-end px-2'>
                     <Badge bg="dark">Created by: Mohyiddine Oujarrar, 2023</Badge>
                 </h5>
             </div>
