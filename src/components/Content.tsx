@@ -1,6 +1,5 @@
 import { Table, Navbar, Container, Badge, Spinner, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHandshakeSlash } from '@fortawesome/free-solid-svg-icons/faHandshakeSlash'
+import { BiWifiOff } from "@react-icons/all-files/bi/BiWifiOff";
 import './Content.scss'
 import logo from '../assets/app-icon.png'; // Tell webpack this JS file uses this image
 import { useCallback, useEffect, useState } from 'react';
@@ -89,7 +88,7 @@ function Content() {
                                         role="status"
                                         aria-hidden="true"
                                         variant="primary"
-                                    /> : <FontAwesomeIcon style={{ color: "#B71C1C" }} icon={faHandshakeSlash} size="2xl" />
+                                    /> : <BiWifiOff style={{ color: "#B71C1C" }} size="3em" />
                             }
                             <span style={{ color: readyState === ReadyState.CLOSED ? "#B71C1C" : "white", fontWeight: "bold" }}>{connectionStatus}</span>
                         </div>
