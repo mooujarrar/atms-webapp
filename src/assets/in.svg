@@ -1,0 +1,13 @@
+<svg width="24" height="24" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <marker id="a" overflow="visible" markerHeight="0.5" markerWidth="0.5" orient="auto-start-reverse" preserveAspectRatio="xMidYMid" viewBox="0 0 1 1">
+   <path transform="scale(.7)" d="m-0.21115-4.1056 6.4223 3.2111a1 1 90 0 1 0 1.7889l-6.4223 3.2111a1.2361 1.2361 31.717 0 1-1.7889-1.1056v-6a1.2361 1.2361 148.28 0 1 1.7889-1.1056z" fill="context-stroke" fill-rule="evenodd"/>
+  </marker>
+ </defs>
+ <g stroke="#000" stroke-linecap="round">
+  <path d="m17.531 14.462 0.05236 3.9957-9.2612 0.04968-0.043455-13.059 9.2613-0.024664-0.05201 4.1838" fill="#fff" stroke-linejoin="round" stroke-width=".78073" style="paint-order:fill markers stroke"/>
+  <path d="m2.4864 5.5619 10.304-3.123v19.053l-10.334-2.9337z" stroke-linejoin="round" stroke-width=".89666" style="paint-order:markers stroke fill"/>
+  <path d="m21.571 11.966h-4.7666" fill="none" marker-end="url(#a)" stroke-width=".88388px"/>
+ </g>
+ <ellipse cx="11.745" cy="11.966" rx=".57967" ry=".59492" fill="#fff"/>
+</svg>
