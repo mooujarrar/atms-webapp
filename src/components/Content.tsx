@@ -4,6 +4,8 @@ import Container from 'react-bootstrap/Container';
 import Badge from 'react-bootstrap/Badge';
 import Spinner from 'react-bootstrap/Spinner';
 import Button from 'react-bootstrap/Button';
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 import { AiOutlineDisconnect } from "@react-icons/all-files/ai/AiOutlineDisconnect";
 import { ImEnter } from "@react-icons/all-files/im/ImEnter";
 import { ImExit } from "@react-icons/all-files/im/ImExit";
@@ -16,6 +18,7 @@ import { IEntry } from '../model/Entry';
 
 
 function Content() {
+    const [tab, setTab] = useState<string>('time-entries');
     const [entries, setEntries] = useState<IEntry[]>([]);
     const [socketUrl, setSocketUrl] = useState(`ws://${window.location.hostname}/ws`);
     const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
@@ -39,6 +42,11 @@ function Content() {
 
     const onResetClicked = useCallback(() => sendMessage('reset_db'), []);
 
+    const toggleTab = (tab: string) => {
+        // TODO: Prepare the processed list with time intervals if the tab is 
+        setTab(tab);
+    }
+
     return (
         <div className="app">
             <Navbar expand="lg" bg="dark" data-bs-theme="dark" className="bg-body-tertiary header">
@@ -54,55 +62,66 @@ function Content() {
                     </Navbar.Brand>
                 </Container>
             </Navbar>
-            <div className="content d-flex flex-column">
-                {/*<div className="status">Connection state to the Hardware: {connectionStatus}</div>*/}
-                <div className="table-container">
-                    {(readyState === ReadyState.OPEN || isFake) ?
-                        <div style={{ width: "100%" }}>
-                            <Table striped bordered variant="dark">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Tag</th>
-                                        <th>Date</th>
-                                        <th>Direction</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {entries.map((listValue, index) => {
-                                        return (
-                                            <tr key={index}>
-                                                <td>{index}</td>
-                                                <td>{listValue.tag}</td>
-                                                <td>{new Date(listValue.date * 1000).toLocaleDateString()} - {new Date(listValue.date * 1000).toLocaleTimeString()}</td>
-                                                <td>{listValue.direction === 0 ?
-                                                    <ImEnter style={{ width: "48px", height: "48px" }} />
-                                                    : <ImExit style={{ width: "48px", height: "48px" }} />}
-                                                </td>
+            <div style={{ padding: "20px" }}>
+                <Tabs
+                    id="my-tab"
+                    activeKey={tab}
+                    onSelect={(k: string | null) => k && toggleTab(k)}
+                    className="mb-3"
+                >
+                    <Tab eventKey="time-entries" title="Time entries">
+                        <div className="table-container">
+                            {(readyState === ReadyState.OPEN || isFake) ?
+                                <div style={{ width: "100%" }}>
+                                    <Table striped bordered variant="dark">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Tag</th>
+                                                <th>Date</th>
+                                                <th>Direction</th>
                                             </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </Table>
-                            <div className='actions'>
-                                <Button variant="light" onClick={onResetClicked}>Reset entries</Button>
-                            </div>
-                        </div> :
-                        <div className="d-flex flex-column align-items-center">
-                            {
-                                readyState === ReadyState.CONNECTING ?
-                                    <Spinner
-                                        as="span"
-                                        animation="grow"
-                                        role="status"
-                                        aria-hidden="true"
-                                        variant="primary"
-                                    /> : <AiOutlineDisconnect style={{ color: "#B71C1C" }} size="3em" />
+                                        </thead>
+                                        <tbody>
+                                            {entries.map((listValue, index) => {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td>{index}</td>
+                                                        <td>{listValue.tag}</td>
+                                                        <td>{new Date(listValue.date * 1000).toLocaleDateString()} - {new Date(listValue.date * 1000).toLocaleTimeString()}</td>
+                                                        <td>{listValue.direction === 0 ?
+                                                            <ImEnter style={{ width: "48px", height: "48px" }} />
+                                                            : <ImExit style={{ width: "48px", height: "48px" }} />}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </Table>
+                                    <div className='actions'>
+                                        <Button variant="light" onClick={onResetClicked}>Reset entries</Button>
+                                    </div>
+                                </div> :
+                                <div className="d-flex flex-column align-items-center">
+                                    {
+                                        readyState === ReadyState.CONNECTING ?
+                                            <Spinner
+                                                as="span"
+                                                animation="grow"
+                                                role="status"
+                                                aria-hidden="true"
+                                                variant="primary"
+                                            /> : <AiOutlineDisconnect style={{ color: "#B71C1C" }} size="3em" />
+                                    }
+                                    <span style={{ color: readyState === ReadyState.CLOSED ? "#B71C1C" : "white", fontWeight: "bold" }}>{connectionStatus}</span>
+                                </div>
                             }
-                            <span style={{ color: readyState === ReadyState.CLOSED ? "#B71C1C" : "white", fontWeight: "bold" }}>{connectionStatus}</span>
                         </div>
-                    }
-                </div>
+                    </Tab>
+                    <Tab eventKey="time-intervals" title="Time intervals">
+                        Tab content for the Processed time intervals table
+                    </Tab>
+                </Tabs>
             </div>
             <div>
                 <h5 className='d-flex justify-content-end px-2'>
